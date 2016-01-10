@@ -14,7 +14,7 @@ namespace EmulationStationAssistant
     public partial class Form1 : Form
     {
         public List<ES_System> systems = new List<ES_System>();
-        public OpenFileDialog openFileDialog1 = new OpenFileDialog();
+        public OpenFileDialog openFileDialog1 = new OpenFileDialog();        
         public SaveFileDialog saveFileDialog1 = new SaveFileDialog();
 
         public Form1()
@@ -180,7 +180,38 @@ namespace EmulationStationAssistant
 
         private void Load_Click(object sender, EventArgs e)
         {
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    List<string> allLines = File.ReadAllLines(openFileDialog1.FileName).ToList<string>();
+                    List<ES_System> _systems = new List<ES_System>();
 
+                    for (int i = 0; i < allLines.Count; i++)
+                    {                        
+                        if (allLines[i].Contains("<name>"))
+                        {
+                            ES_System temp = new ES_System();                                                        
+                            temp.name = allLines[i].Replace("<name>", "").Replace("</name>", "").Trim();
+                            temp.fullname = allLines[i + 1].Replace("<fullname>", "").Replace("</fullname>", "").Trim();
+                            temp.path = allLines[i + 2].Replace("<path>", "").Replace("</path>", "").Trim();
+                            temp.extension = allLines[i + 3].Replace("<extension>", "").Replace("</extension>", "").Trim();
+                            temp.command = allLines[i + 4].Replace("<command>", "").Replace("</command>", "").Trim();
+                            temp.platform = allLines[i + 5].Replace("<platform>", "").Replace("</platform>", "").Trim();
+                            temp.theme = allLines[i + 6].Replace("<theme>", "").Replace("</theme>", "").Trim();
+                            _systems.Add(temp);
+                        }                        
+                    }
+
+                    ConfigList.Items.Clear();
+                    systems = _systems;
+                    foreach (ES_System sys in systems)
+                    {
+                        ConfigList.Items.Add(sys.fullname);
+                    }                    
+                }
+                catch (Exception ex) { MessageBox.Show("Error: " + ex.Message); }
+            }
         }
 
         private void SysTheme_SelectedIndexChanged(object sender, EventArgs e)
@@ -215,10 +246,13 @@ namespace EmulationStationAssistant
 
         private void PathButton_Click(object sender, EventArgs e)
         {
-            if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            using (FolderBrowserDialog x = new FolderBrowserDialog())
             {
-                SysPath.Text = openFileDialog1.FileName;
-            }   
+                if (x.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    SysPath.Text = openFileDialog1.FileName;
+                }
+            }
         }
 
         /// <summary>

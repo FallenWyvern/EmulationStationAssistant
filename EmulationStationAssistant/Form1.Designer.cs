@@ -363,7 +363,6 @@
             // 
             // LoadButton
             // 
-            this.LoadButton.Enabled = false;
             this.LoadButton.Location = new System.Drawing.Point(63, 447);
             this.LoadButton.Name = "LoadButton";
             this.LoadButton.Size = new System.Drawing.Size(45, 23);
